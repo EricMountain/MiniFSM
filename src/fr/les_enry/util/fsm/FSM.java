@@ -13,6 +13,7 @@ public class FSM {
 		State initialState = null;
 		State endState = null;
 		Event event = null;
+		Action action = null;
 		
 		
 		Rule state(State state) {
@@ -30,6 +31,15 @@ public class FSM {
 			return this;
 		}
 		
+		Rule action(Action action) {
+			this.action = action;
+			
+			return this;
+		}
+		
+		void doIt() {
+			action.act();
+		}
 	}
 	
 	FSM() {
@@ -54,6 +64,7 @@ public class FSM {
 		for (Rule rule : rules) {
 			if (rule.initialState == state && rule.event == event) {
 				state = rule.endState;
+				rule.doIt();
 				return state;
 			}
 				

@@ -7,6 +7,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class FSMTest {
+	private final State INIT = State.build("init");
+	private final State INIT2 = State.build("init");
+	private final State TERM = State.build("term");
+	private final Event INSERT_COIN = Event.build("insert coin");
 
 	@Before
 	public void setUp() throws Exception {
@@ -17,13 +21,23 @@ public class FSMTest {
 	}
 
 	@Test
-	public void test() {
+	public void testFSM() {
 		FSM fsm = new FSM();
-		fsm.rule().state(State.build("init")).event(Event.build("insert coin")).state(State.build("term"));
-		fsm.start(State.build("init"));
-		fsm.event(Event.build("insert coin"));
+		final String hi = "hello";
+		fsm.rule().state(INIT).event(INSERT_COIN).action(new Action(hi){public boolean act(){System.out.println(hi); return true;}}).state(TERM);
+		fsm.start(INIT);
+		fsm.event(INSERT_COIN);
 		
 		assertTrue(fsm.getState().equals(State.build("term")));
 	}
 
+	@Test
+	public void testEquality() {
+		assertTrue(INIT == INIT2);
+	}
+
+	@Test
+	public void testInequality() {
+		assertTrue(INIT != TERM);
+	}
 }
