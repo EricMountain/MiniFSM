@@ -47,7 +47,6 @@ public class FSMTest {
 		fsm.event(INSERT_COIN);
 		
 		assertTrue(fsm.getState().equals(TERM));
-	
 	}
 
 	@Test
@@ -129,7 +128,5 @@ public class FSMTest {
 		
 		fsm.event(RESET);
 		assertTrue(fsm.getState().equals(BOAT_TO_PLACE));
-		
 	}
-	
 }
