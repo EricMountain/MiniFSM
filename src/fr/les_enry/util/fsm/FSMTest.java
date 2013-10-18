@@ -26,7 +26,7 @@ public class FSMTest {
 
 		final String hi = "hello";
 		final StringBuffer out = new StringBuffer();
-		fsm.rule().state(INIT).event(INSERT_COIN).action(new Action(){public boolean act(){ out.append(hi).append(" world…"); return true;}}).state(TERM);
+		fsm.rule().initial(INIT).event(INSERT_COIN).action(new Action(){public boolean act(){ out.append(hi).append(" world…"); return true;}}).ok(TERM);
 		fsm.start(INIT);
 		fsm.event(INSERT_COIN);
 		
@@ -42,7 +42,7 @@ public class FSMTest {
 		final State TERM = fsm.state("term");
 		final Event INSERT_COIN = fsm.event("insert coin");
 
-		fsm.rule().state(INIT).event(INSERT_COIN).action(new Action(){public boolean act(){return false;}}).state(TERM);
+		fsm.rule().initial(INIT).event(INSERT_COIN).action(new Action(){public boolean act(){return false;}}).ok(TERM);
 		fsm.start(INIT);
 		fsm.event(INSERT_COIN);
 		
@@ -59,12 +59,77 @@ public class FSMTest {
 		final State FAIL = fsm.state("fail");
 		final Event INSERT_COIN = fsm.event("insert coin");
 
-		fsm.rule().state(INIT).event(INSERT_COIN).action(new Action(){public boolean act(){return false;}}).state(TERM).fail(FAIL);
+		fsm.rule().initial(INIT).event(INSERT_COIN).action(new Action(){public boolean act(){return false;}}).ok(TERM).fail(FAIL);
 		fsm.start(INIT);
 		fsm.event(INSERT_COIN);
 		
 		assertTrue(fsm.getState().equals(FAIL));
-	
 	}
 
+	@Test
+	public void testNavyBatal() {
+		FSM fsm = new FSM();
+		
+		final State BOAT_TO_PLACE = fsm.state("Boat to place");
+		final State CHECK_BOAT_TO_PLACE = fsm.state("Check boat to place");
+		final State SHOT_NEEDED = fsm.state("Shot needed");
+		final State CHECK_WON = fsm.state("Check won");
+		final State GAME_OVER = fsm.state("Game over");
+		
+		final Event BOAT_PLACED = fsm.event("Boat placed");
+		final Event MORE_BOATS = fsm.event("More boats to place");
+		final Event NO_MORE_BOATS = fsm.event("No more boats to place");
+		final Event SHOT_TAKEN = fsm.event("Shot taken");
+		final Event NOT_WON = fsm.event("Game not won");
+		final Event WON = fsm.event("Game won");
+		final Event RESET = fsm.event("Reset game");
+		
+		fsm.rule().initial(BOAT_TO_PLACE).event(BOAT_PLACED).ok(CHECK_BOAT_TO_PLACE);
+		fsm.rule().initial(CHECK_BOAT_TO_PLACE).event(MORE_BOATS).ok(BOAT_TO_PLACE);
+		fsm.rule().initial(CHECK_BOAT_TO_PLACE).event(NO_MORE_BOATS).ok(SHOT_NEEDED);
+		fsm.rule().initial(SHOT_NEEDED).event(SHOT_TAKEN).ok(CHECK_WON);
+		fsm.rule().initial(CHECK_WON).event(NOT_WON).ok(SHOT_NEEDED);
+		fsm.rule().initial(CHECK_WON).event(WON).ok(GAME_OVER);
+		fsm.rule().initial(GAME_OVER).event(RESET).ok(BOAT_TO_PLACE);
+		
+		fsm.start(BOAT_TO_PLACE);
+		
+		fsm.event(BOAT_PLACED);
+		fsm.event(MORE_BOATS);
+		fsm.event(BOAT_PLACED);
+		fsm.event(MORE_BOATS);
+		fsm.event(BOAT_PLACED);
+		fsm.event(MORE_BOATS);
+		fsm.event(BOAT_PLACED);
+		fsm.event(MORE_BOATS);
+		fsm.event(BOAT_PLACED);
+		fsm.event(MORE_BOATS);
+		assertTrue(fsm.getState().equals(BOAT_TO_PLACE));
+		fsm.event(BOAT_PLACED);
+		assertTrue(fsm.getState().equals(CHECK_BOAT_TO_PLACE));
+		fsm.event(NO_MORE_BOATS);
+		assertTrue(fsm.getState().equals(SHOT_NEEDED));
+		
+		fsm.event(SHOT_TAKEN);
+		fsm.event(NOT_WON);
+		fsm.event(SHOT_TAKEN);
+		fsm.event(NOT_WON);
+		fsm.event(SHOT_TAKEN);
+		fsm.event(NOT_WON);
+		fsm.event(SHOT_TAKEN);
+		fsm.event(NOT_WON);
+		fsm.event(SHOT_TAKEN);
+		assertTrue(fsm.getState().equals(CHECK_WON));
+		fsm.event(NOT_WON);
+		assertTrue(fsm.getState().equals(SHOT_NEEDED));
+		fsm.event(SHOT_TAKEN);
+		assertTrue(fsm.getState().equals(CHECK_WON));
+		fsm.event(WON);
+		assertTrue(fsm.getState().equals(GAME_OVER));
+		
+		fsm.event(RESET);
+		assertTrue(fsm.getState().equals(BOAT_TO_PLACE));
+		
+	}
+	
 }

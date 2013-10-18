@@ -15,17 +15,20 @@ public class FSM {
 	private final Map<String, State> allStates = new HashMap<String, State>();
 	
 	public class Rule {
-		State initialState = null;
-		State endState = null;
-		State failState = null;
-		Event event = null;
-		Action action = null;
+		private State initialState = null;
+		private State endState = null;
+		private State failState = null;
+		private Event event = null;
+		private Action action = null;
 
-		public Rule state(State state) {
-			if (initialState == null)
-				initialState = state;
-			else
-				endState = state;
+		public Rule initial(State state) {
+			initialState = state;
+
+			return this;
+		}
+
+		public Rule ok(State state) {
+			endState = state;
 
 			return this;
 		}
@@ -56,7 +59,7 @@ public class FSM {
 		 * @return final state
 		 */
 		State apply() {
-			if (!action.act() && failState != null)
+			if (action != null && !action.act() && failState != null)
 				return failState;
 			else
 				return endState;
