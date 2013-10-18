@@ -7,10 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class FSMTest {
-	private final State INIT = State.build("init");
-	private final State INIT2 = State.build("init");
-	private final State TERM = State.build("term");
-	private final Event INSERT_COIN = Event.build("insert coin");
 
 	@Before
 	public void setUp() throws Exception {
@@ -23,21 +19,52 @@ public class FSMTest {
 	@Test
 	public void testFSM() {
 		FSM fsm = new FSM();
+
+		final State INIT = fsm.state("init");
+		final State TERM = fsm.state("term");
+		final Event INSERT_COIN = fsm.event("insert coin");
+
 		final String hi = "hello";
-		fsm.rule().state(INIT).event(INSERT_COIN).action(new Action(hi){public boolean act(){System.out.println(hi); return true;}}).state(TERM);
+		final StringBuffer out = new StringBuffer();
+		fsm.rule().state(INIT).event(INSERT_COIN).action(new Action(){public boolean act(){ out.append(hi).append(" world…"); return true;}}).state(TERM);
 		fsm.start(INIT);
 		fsm.event(INSERT_COIN);
 		
-		assertTrue(fsm.getState().equals(State.build("term")));
+		assertTrue(fsm.getState().equals(TERM));
+		assertTrue(out.toString().equals("hello world…"));
 	}
 
 	@Test
-	public void testEquality() {
-		assertTrue(INIT == INIT2);
+	public void testFail() {
+		FSM fsm = new FSM();
+
+		final State INIT = fsm.state("init");
+		final State TERM = fsm.state("term");
+		final Event INSERT_COIN = fsm.event("insert coin");
+
+		fsm.rule().state(INIT).event(INSERT_COIN).action(new Action(){public boolean act(){return false;}}).state(TERM);
+		fsm.start(INIT);
+		fsm.event(INSERT_COIN);
+		
+		assertTrue(fsm.getState().equals(TERM));
+	
 	}
 
 	@Test
-	public void testInequality() {
-		assertTrue(INIT != TERM);
+	public void testFail2() {
+		FSM fsm = new FSM();
+
+		final State INIT = fsm.state("init");
+		final State TERM = fsm.state("term");
+		final State FAIL = fsm.state("fail");
+		final Event INSERT_COIN = fsm.event("insert coin");
+
+		fsm.rule().state(INIT).event(INSERT_COIN).action(new Action(){public boolean act(){return false;}}).state(TERM).fail(FAIL);
+		fsm.start(INIT);
+		fsm.event(INSERT_COIN);
+		
+		assertTrue(fsm.getState().equals(FAIL));
+	
 	}
+
 }

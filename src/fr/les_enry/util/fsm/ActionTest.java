@@ -16,17 +16,75 @@ public class ActionTest {
 	public void tearDown() throws Exception {
 	}
 
-	@SuppressWarnings("unused")
-	@Test
-	public void testDuplicateAction() {
-		Action first = new Action("dupthis") { public boolean act() { return true; }};
-		try {
-			Action second = new Action("dupthis") { public boolean act() { return true; }};
-			fail("Duplicate action detection failed.");
-		} catch (RuntimeException e) {
-			assertTrue("Exception type for duplicate action", e instanceof Action.AlreadyExistsException);
+	static class StaticAction extends Action {
+		StaticAction() {
+			super();
 		}
 
+		boolean act() {
+			return true;
+		}
+	}
+
+	@Test
+	public void testCreateActionByPassingClass() {
+		FSM fsm = new FSM();
+
+		Action first = fsm.action(StaticAction.class);
+
+		assertNotNull(first);
+	}
+
+	@Test
+	public void testCreateAnonAction() {
+		Action first = new Action() {
+			boolean act() {
+				return false;
+			}
+		};
+
+		assertNotNull(first);
+
+		Action second = new Action() {
+			boolean act() {
+				return false;
+			}
+		};
+
+		assertNotNull(second);
+
+		assertNotSame(first, second);
+	}
+
+	@Test
+	public void testActionSideEffect() {
+		class IntegerWrapper {
+			int val;
+
+			void put(int x) {
+				val = x;
+			}
+			
+			int get() {
+				return val;
+			}
+		};
+		
+		final int x = 9;
+		final IntegerWrapper val = new IntegerWrapper();
+		
+		Action first = new Action() {
+			boolean act() {
+				val.put(x * x);
+				return false;
+			}
+		};
+
+		assertNotNull(first);
+
+		assertFalse(first.act());
+
+		assertTrue(val.get() == x * x);
 	}
 
 }

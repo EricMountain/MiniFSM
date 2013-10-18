@@ -13,9 +13,10 @@ public class StateTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		init = State.build("init");
-		term = State.build("term");
-		init2 = State.build("init");
+		FSM fsm = new FSM();
+		init = fsm.state("init");
+		term = fsm.state("term");
+		init2 = fsm.state("init");
 	}
 
 	@After

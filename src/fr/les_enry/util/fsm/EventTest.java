@@ -13,9 +13,11 @@ public class EventTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		init = Event.build("init");
-		term = Event.build("term");
-		init2 = Event.build("init");
+		FSM fsm = new FSM();
+		
+		init = fsm.event("init");
+		term = fsm.event("term");
+		init2 = fsm.event("init");
 	}
 
 	@After
