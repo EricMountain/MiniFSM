@@ -21,7 +21,7 @@ public class ActionTest {
 			super();
 		}
 
-		boolean act() {
+		public boolean act() {
 			return true;
 		}
 	}
@@ -38,7 +38,7 @@ public class ActionTest {
 	@Test
 	public void testCreateAnonAction() {
 		Action first = new Action() {
-			boolean act() {
+			public boolean act() {
 				return false;
 			}
 		};
@@ -46,7 +46,7 @@ public class ActionTest {
 		assertNotNull(first);
 
 		Action second = new Action() {
-			boolean act() {
+			public boolean act() {
 				return false;
 			}
 		};
@@ -74,7 +74,7 @@ public class ActionTest {
 		final IntegerWrapper val = new IntegerWrapper();
 		
 		Action first = new Action() {
-			boolean act() {
+			public boolean act() {
 				val.put(x * x);
 				return false;
 			}
@@ -86,5 +86,4 @@ public class ActionTest {
 
 		assertTrue(val.get() == x * x);
 	}
-
 }

@@ -1,9 +1,9 @@
 package fr.les_enry.util.fsm;
 
 public abstract class Action extends BaseType {
-	Action() {
+	public Action() {
 		super();
 	}
 	
-	abstract boolean act();
+	abstract public boolean act();
 }
