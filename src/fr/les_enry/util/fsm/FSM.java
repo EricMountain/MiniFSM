@@ -66,7 +66,7 @@ public class FSM {
 		}
 	}
 
-	class NoApplicableRuleException extends RuntimeException {
+	public class NoApplicableRuleException extends RuntimeException {
 		/**
 		 * 
 		 */
@@ -77,7 +77,7 @@ public class FSM {
 		}
 	}
 
-	class UnknownBaseTypeException extends RuntimeException {
+	public class UnknownBaseTypeException extends RuntimeException {
 		/**
 		 * Serialisation ID.
 		 */
@@ -88,7 +88,7 @@ public class FSM {
 		}
 	}
 
-	class NoMapForBaseTypeException extends RuntimeException {
+	public class NoMapForBaseTypeException extends RuntimeException {
 		/**
 		 * Serialisation ID.
 		 */
