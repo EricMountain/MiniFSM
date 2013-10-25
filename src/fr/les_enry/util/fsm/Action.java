@@ -5,5 +5,11 @@ public abstract class Action extends BaseType {
 		super();
 	}
 	
-	abstract public boolean act();
+	public boolean act() {
+		return false;
+	}
+	
+	public boolean act(Object... args) {
+		return act();
+	}
 }

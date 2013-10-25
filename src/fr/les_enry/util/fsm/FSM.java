@@ -56,10 +56,11 @@ public class FSM {
 		 * return the end state, else return the failure state. If no failure
 		 * state is defined, always returns the end state.
 		 * 
+		 * @param args Optional arguments to pass to the action
 		 * @return final state
 		 */
-		State apply() {
-			if (action != null && !action.act() && failState != null)
+		State apply(Object... args) {
+			if (action != null && !action.act(args) && failState != null)
 				return failState;
 			else
 				return endState;
@@ -190,18 +191,24 @@ public class FSM {
 		return rule;
 	}
 
+	public State event(Event event) {
+		return event(event, (Object) null);
+	}
+
+	
 	/**
 	 * Processes occurrence of an event. Searches for an applicable rule, and
 	 * runs the associated action.
 	 * 
 	 * @param event
+	 * @param args Optional objects to pass to the action 
 	 * @return state entered after applying the rule
 	 */
-	public State event(Event event) {
+	public State event(Event event, Object... args) {
 		// TODO Replace this full-scan with a Map lookup
 		for (Rule rule : rules) {
 			if (rule.initialState == state && rule.event == event) {
-				state = rule.apply();
+				state = rule.apply(args);
 				return state;
 			}
 		}

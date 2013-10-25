@@ -35,6 +35,23 @@ public class FSMTest {
 	}
 
 	@Test
+	public void testFSMWithVarargAction() {
+		FSM fsm = new FSM();
+
+		final State INIT = fsm.state("init");
+		final State TERM = fsm.state("term");
+		final Event INSERT_COIN = fsm.event("insert coin");
+
+		final StringBuffer out = new StringBuffer();
+		fsm.rule().initial(INIT).event(INSERT_COIN).action(new Action(){public boolean act(Object... args){ for (Object s : args) out.append(s).append(" "); return true;}}).ok(TERM);
+		fsm.start(INIT);
+		fsm.event(INSERT_COIN, "hello", "world", "how", "are", "you", "?");
+		
+		assertTrue(fsm.getState().equals(TERM));
+		assertTrue(out.toString().equals("hello world how are you ? "));
+	}
+
+	@Test
 	public void testFail() {
 		FSM fsm = new FSM();
 
