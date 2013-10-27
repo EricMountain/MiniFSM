@@ -13,7 +13,7 @@ public class FSM {
 
 	private final Map<String, Event> allEvents = new HashMap<String, Event>();
 	private final Map<String, State> allStates = new HashMap<String, State>();
-	
+
 	public class Rule {
 		private State initialState = null;
 		private State endState = null;
@@ -56,7 +56,8 @@ public class FSM {
 		 * return the end state, else return the failure state. If no failure
 		 * state is defined, always returns the end state.
 		 * 
-		 * @param args Optional arguments to pass to the action
+		 * @param args
+		 *            Optional arguments to pass to the action
 		 * @return final state
 		 */
 		State apply(Object... args) {
@@ -99,10 +100,6 @@ public class FSM {
 			super(message);
 		}
 	}
-
-	// public FSM() {
-	// super();
-	// }
 
 	private BaseType factory(String name, final Class<? extends BaseType> type) {
 		BaseType obj;
@@ -157,7 +154,8 @@ public class FSM {
 		} else if (State.class.isAssignableFrom(object.getClass())) {
 			allStates.put(object.getName(), (State) object);
 		} else if (Action.class.isAssignableFrom(object.getClass())) {
-			throw new NoMapForBaseTypeException("No map for subclasses of Action: " + object.getClass());
+			throw new NoMapForBaseTypeException(
+					"No map for subclasses of Action: " + object.getClass());
 		} else {
 			throw new UnknownBaseTypeException("Unknown class: "
 					+ object.getClass().getName());
@@ -170,7 +168,8 @@ public class FSM {
 		} else if (State.class.isAssignableFrom(type)) {
 			return allStates.get(name);
 		} else if (Action.class.isAssignableFrom(type)) {
-			throw new NoMapForBaseTypeException("No map for subclasses of Action: " + type);
+			throw new NoMapForBaseTypeException(
+					"No map for subclasses of Action: " + type);
 		} else {
 			throw new UnknownBaseTypeException("Unknown class: "
 					+ type.getName());
@@ -195,16 +194,28 @@ public class FSM {
 		return event(event, (Object) null);
 	}
 
-	
+	/**
+	 * Clears all rules and resets current state to null.
+	 */
+	public void reset() {
+		rules.clear();
+		state = null;
+	}
+
 	/**
 	 * Processes occurrence of an event. Searches for an applicable rule, and
 	 * runs the associated action.
 	 * 
+	 * @param isSoftEvent
+	 *            If true, do not throw exception if no applicable rule is
+	 *            found.
 	 * @param event
-	 * @param args Optional objects to pass to the action 
-	 * @return state entered after applying the rule
+	 * @param args
+	 *            Optional objects to pass to the action
+	 * @return state entered after applying the rule, or null if no applicable
+	 *         rule found and isSoftEvent is true.
 	 */
-	public State event(Event event, Object... args) {
+	public State event(boolean isSoftEvent, Event event, Object... args) {
 		// TODO Replace this full-scan with a Map lookup
 		for (Rule rule : rules) {
 			if (rule.initialState == state && rule.event == event) {
@@ -213,8 +224,38 @@ public class FSM {
 			}
 		}
 
-		throw new NoApplicableRuleException(
-				"No applicable state/event combination: " + state + ", "
-						+ event);
+		if (isSoftEvent)
+			return null;
+		else
+			throw new NoApplicableRuleException(
+					"No applicable state/event combination: " + state + ", "
+							+ event);
 	}
+
+	/**
+	 * Processes occurrence of an event. Searches for an applicable rule, and
+	 * runs the associated action.
+	 * 
+	 * @param event
+	 * @param args
+	 *            Optional objects to pass to the action
+	 * @return state entered after applying the rule
+	 */
+	public State event(Event event, Object... args) {
+		return event(false, event, args);
+	}
+	
+	/**
+	 * Processes occurrence of an event. Searches for an applicable rule, and
+	 * runs the associated action.  If no rule applies, returns null.
+	 * 
+	 * @param event
+	 * @param args
+	 *            Optional objects to pass to the action
+	 * @return state entered after applying the rule
+	 */
+	public State softEvent(Event event, Object... args) {
+		return event(true, event, args);
+	}
+	
 }
