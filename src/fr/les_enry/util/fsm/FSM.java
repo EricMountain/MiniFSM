@@ -180,7 +180,7 @@ public class FSM {
 		this.state = state;
 	}
 
-	State getState() {
+	public State getState() {
 		return state;
 	}
 
