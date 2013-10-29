@@ -184,6 +184,18 @@ public class FSM {
 		return state;
 	}
 
+	public boolean isState(State state) {
+		return this.state == state;
+	}
+	
+	public boolean isStateIn(State... states) {
+		for (State state : states) 
+			if (isState(state))
+				return true;
+		
+		return false;
+	}
+	
 	public Rule rule() {
 		Rule rule = new Rule();
 		rules.add(rule);

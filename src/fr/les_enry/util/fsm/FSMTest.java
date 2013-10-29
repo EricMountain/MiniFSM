@@ -68,6 +68,7 @@ public class FSMTest {
 
 		final State INIT = fsm.state("init");
 		final State TERM = fsm.state("term");
+		final State NOT_USED = fsm.state("not used");
 		final Event INSERT_COIN = fsm.event("insert coin");
 
 		fsm.rule().initial(INIT).event(INSERT_COIN).action(new Action() {
@@ -79,6 +80,12 @@ public class FSMTest {
 		fsm.event(INSERT_COIN);
 
 		assertTrue(fsm.getState().equals(TERM));
+		
+		assertTrue(fsm.isState(TERM));
+		assertFalse(fsm.isState(INIT));
+		
+		assertTrue(fsm.isStateIn(TERM, INIT));
+		assertFalse(fsm.isStateIn(INIT, NOT_USED));
 	}
 
 	@Test
