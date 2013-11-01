@@ -37,6 +37,11 @@ public class FSMTest {
 
 		assertTrue(fsm.getState().equals(TERM));
 		assertTrue(out.toString().equals("hello world…"));
+		
+		State byName = fsm.getStateByName("init");
+		assertTrue(byName == INIT);
+		fsm.forceState(byName);
+		assertTrue(fsm.getState() == INIT);
 	}
 
 	@Test

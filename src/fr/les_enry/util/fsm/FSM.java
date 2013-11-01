@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class FSM {
 
+	private String name = "{unnamed_FSM}";
+	
 	private List<Rule> rules = new ArrayList<Rule>();
 
 	private State state = null;
@@ -101,6 +103,14 @@ public class FSM {
 		}
 	}
 
+	public FSM() {
+		super();
+	}
+	
+	public FSM(String name) {
+		this.name = name;
+	}
+	
 	private BaseType factory(String name, final Class<? extends BaseType> type) {
 		BaseType obj;
 
@@ -228,10 +238,14 @@ public class FSM {
 	 *         rule found and isSoftEvent is true.
 	 */
 	public State event(boolean isSoftEvent, Event event, Object... args) {
+		// TODO Implement proper logging
+		System.out.println(toString() + ">> Received event: " + event);
+		
 		// TODO Replace this full-scan with a Map lookup
 		for (Rule rule : rules) {
 			if (rule.initialState == state && rule.event == event) {
 				state = rule.apply(args);
+				System.out.println(toString() + ">> Resulting state: " + state);
 				return state;
 			}
 		}
@@ -243,7 +257,7 @@ public class FSM {
 					"No applicable state/event combination: " + state + ", "
 							+ event);
 	}
-
+	
 	/**
 	 * Processes occurrence of an event. Searches for an applicable rule, and
 	 * runs the associated action.
@@ -268,6 +282,30 @@ public class FSM {
 	 */
 	public State softEvent(Event event, Object... args) {
 		return event(true, event, args);
+	}
+
+	/**
+	 * Forces the state of the FSM w/o applying any rules.
+	 * 
+	 * @param state
+	 */
+	public void forceState(State state) {
+		this.state = state;
+	}
+	
+	/**
+	 * Gets a state object by its name.
+	 * 
+	 * @param name state identifier
+	 * @return matching state object or null
+	 */
+	public State getStateByName(String name) {
+		return allStates.get(name);
+	}
+	
+	@Override
+	public String toString() {
+		return name;
 	}
 	
 }
