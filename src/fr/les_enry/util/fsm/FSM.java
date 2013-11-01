@@ -299,7 +299,7 @@ public class FSM {
 	 * @param name state identifier
 	 * @return matching state object or null
 	 */
-	public State getStateByName(String name) {
+	public State findStateByName(String name) {
 		return allStates.get(name);
 	}
 	
