@@ -1,6 +1,10 @@
 package fr.les_enry.util.fsm;
 
-public class State extends BaseType {
+import java.io.Serializable;
+
+public class State extends BaseType implements Serializable {
+
+	private static final long serialVersionUID = 1651655074263714270L;
 
 	State() {
 		super();

@@ -1,6 +1,11 @@
 package fr.les_enry.util.fsm;
 
-public abstract class Action extends BaseType {
+import java.io.Serializable;
+
+public abstract class Action extends BaseType implements Serializable {
+	
+	private static final long serialVersionUID = -7362524484682125752L;
+
 	public Action() {
 		super();
 	}

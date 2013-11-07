@@ -1,14 +1,17 @@
 package fr.les_enry.util.fsm;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FSM {
+public class FSM implements Serializable {
+
+	private static final long serialVersionUID = 5664588699774045358L;
 
 	private String name = "{unnamed_FSM}";
-	
+
 	private List<Rule> rules = new ArrayList<Rule>();
 
 	private State state = null;
@@ -16,7 +19,10 @@ public class FSM {
 	private final Map<String, Event> allEvents = new HashMap<String, Event>();
 	private final Map<String, State> allStates = new HashMap<String, State>();
 
-	public class Rule {
+	public class Rule implements Serializable {
+
+		private static final long serialVersionUID = 3292473755494756309L;
+
 		private State initialState = null;
 		private State endState = null;
 		private State failState = null;
@@ -106,11 +112,11 @@ public class FSM {
 	public FSM() {
 		super();
 	}
-	
+
 	public FSM(String name) {
 		this.name = name;
 	}
-	
+
 	private BaseType factory(String name, final Class<? extends BaseType> type) {
 		BaseType obj;
 
@@ -197,15 +203,15 @@ public class FSM {
 	public boolean isState(State state) {
 		return this.state == state;
 	}
-	
+
 	public boolean isStateIn(State... states) {
-		for (State state : states) 
+		for (State state : states)
 			if (isState(state))
 				return true;
-		
+
 		return false;
 	}
-	
+
 	public Rule rule() {
 		Rule rule = new Rule();
 		rules.add(rule);
@@ -240,7 +246,7 @@ public class FSM {
 	public State event(boolean isSoftEvent, Event event, Object... args) {
 		// TODO Implement proper logging
 		System.out.println(toString() + ">> Received event: " + event);
-		
+
 		// TODO Replace this full-scan with a Map lookup
 		for (Rule rule : rules) {
 			if (rule.initialState == state && rule.event == event) {
@@ -257,7 +263,7 @@ public class FSM {
 					"No applicable state/event combination: " + state + ", "
 							+ event);
 	}
-	
+
 	/**
 	 * Processes occurrence of an event. Searches for an applicable rule, and
 	 * runs the associated action.
@@ -270,10 +276,10 @@ public class FSM {
 	public State event(Event event, Object... args) {
 		return event(false, event, args);
 	}
-	
+
 	/**
 	 * Processes occurrence of an event. Searches for an applicable rule, and
-	 * runs the associated action.  If no rule applies, returns null.
+	 * runs the associated action. If no rule applies, returns null.
 	 * 
 	 * @param event
 	 * @param args
@@ -292,20 +298,21 @@ public class FSM {
 	public void forceState(State state) {
 		this.state = state;
 	}
-	
+
 	/**
 	 * Gets a state object by its name.
 	 * 
-	 * @param name state identifier
+	 * @param name
+	 *            state identifier
 	 * @return matching state object or null
 	 */
 	public State findStateByName(String name) {
 		return allStates.get(name);
 	}
-	
+
 	@Override
 	public String toString() {
 		return name;
 	}
-	
+
 }
