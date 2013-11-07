@@ -17,6 +17,9 @@ public class ActionTest {
 	}
 
 	static class StaticAction extends Action {
+
+		private static final long serialVersionUID = -1742651398108383124L;
+
 		StaticAction() {
 			super();
 		}
@@ -35,6 +38,7 @@ public class ActionTest {
 		assertNotNull(first);
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testCreateAnonAction() {
 		Action first = new Action() {
@@ -56,6 +60,7 @@ public class ActionTest {
 		assertNotSame(first, second);
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testActionSideEffect() {
 		class IntegerWrapper {
@@ -87,6 +92,7 @@ public class ActionTest {
 		assertTrue(val.get() == x * x);
 	}
 	
+	@SuppressWarnings("serial")
 	@Test
 	public void testActionWithVararg() {
 		class IntegerWrapper {
@@ -126,6 +132,7 @@ public class ActionTest {
 		
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testActionWithNullVararg() {
 		Action action = new Action() {

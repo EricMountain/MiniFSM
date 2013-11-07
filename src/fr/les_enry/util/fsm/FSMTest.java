@@ -16,6 +16,7 @@ public class FSMTest {
 	public void tearDown() throws Exception {
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testFSM() {
 		FSM fsm = new FSM();
@@ -44,6 +45,7 @@ public class FSMTest {
 		assertTrue(fsm.getState() == INIT);
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testFSMWithVarargAction() {
 		FSM fsm = new FSM();
@@ -67,6 +69,7 @@ public class FSMTest {
 		assertTrue(out.toString().equals("hello world how are you ? "));
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testFail() {
 		FSM fsm = new FSM();
@@ -93,6 +96,7 @@ public class FSMTest {
 		assertFalse(fsm.isStateIn(INIT, NOT_USED));
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testFail2() {
 		FSM fsm = new FSM();
@@ -113,6 +117,7 @@ public class FSMTest {
 		assertTrue(fsm.getState().equals(FAIL));
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testNoRuleApplies() {
 		FSM fsm = new FSM();
@@ -141,7 +146,8 @@ public class FSMTest {
 			assertTrue(fsm.getState().equals(INIT));
 		}
 	}
-
+	
+	@SuppressWarnings("serial")
 	@Test
 	public void testReset() {
 		FSM fsm = new FSM();
