@@ -1,6 +1,14 @@
 package fr.les_enry.util.fsm;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import org.junit.After;
 import org.junit.Before;
@@ -38,7 +46,7 @@ public class FSMTest {
 
 		assertTrue(fsm.getState().equals(TERM));
 		assertTrue(out.toString().equals("hello world…"));
-		
+
 		State byName = fsm.findStateByName("init");
 		assertTrue(byName == INIT);
 		fsm.forceState(byName);
@@ -88,10 +96,10 @@ public class FSMTest {
 		fsm.event(INSERT_COIN);
 
 		assertTrue(fsm.getState().equals(TERM));
-		
+
 		assertTrue(fsm.isState(TERM));
 		assertFalse(fsm.isState(INIT));
-		
+
 		assertTrue(fsm.isStateIn(TERM, INIT));
 		assertFalse(fsm.isStateIn(INIT, NOT_USED));
 	}
@@ -146,7 +154,7 @@ public class FSMTest {
 			assertTrue(fsm.getState().equals(INIT));
 		}
 	}
-	
+
 	@SuppressWarnings("serial")
 	@Test
 	public void testReset() {
@@ -165,12 +173,12 @@ public class FSMTest {
 		fsm.start(INIT);
 
 		assertTrue(fsm.getState().equals(INIT));
-		
+
 		fsm.reset();
-		
+
 		assertTrue(fsm.getState() == null);
 	}
-	
+
 	@Test
 	public void testNavyBattle() {
 		FSM fsm = new FSM();
@@ -237,5 +245,86 @@ public class FSMTest {
 
 		fsm.event(RESET);
 		assertTrue(fsm.getState().equals(BOAT_TO_PLACE));
+	}
+
+	@Test
+	public void testNavyBattleSerialisation() {
+		FSM fsm = new FSM();
+
+		final State BOAT_TO_PLACE = fsm.state("Boat to place");
+		final State CHECK_BOAT_TO_PLACE = fsm.state("Check boat to place");
+		final State SHOT_NEEDED = fsm.state("Shot needed");
+		final State CHECK_WON = fsm.state("Check won");
+		final State GAME_OVER = fsm.state("Game over");
+
+		final Event BOAT_PLACED = fsm.event("Boat placed");
+		final Event MORE_BOATS = fsm.event("More boats to place");
+		final Event NO_MORE_BOATS = fsm.event("No more boats to place");
+		final Event SHOT_TAKEN = fsm.event("Shot taken");
+		final Event NOT_WON = fsm.event("Game not won");
+		final Event WON = fsm.event("Game won");
+		final Event RESET = fsm.event("Reset game");
+
+		fsm.rule().initial(BOAT_TO_PLACE).event(BOAT_PLACED)
+				.ok(CHECK_BOAT_TO_PLACE);
+		fsm.rule().initial(CHECK_BOAT_TO_PLACE).event(MORE_BOATS)
+				.ok(BOAT_TO_PLACE);
+		fsm.rule().initial(CHECK_BOAT_TO_PLACE).event(NO_MORE_BOATS)
+				.ok(SHOT_NEEDED);
+		fsm.rule().initial(SHOT_NEEDED).event(SHOT_TAKEN).ok(CHECK_WON);
+		fsm.rule().initial(CHECK_WON).event(NOT_WON).ok(SHOT_NEEDED);
+		fsm.rule().initial(CHECK_WON).event(WON).ok(GAME_OVER);
+		fsm.rule().initial(GAME_OVER).event(RESET).ok(BOAT_TO_PLACE);
+
+		fsm.start(BOAT_TO_PLACE);
+
+		fsm.event(BOAT_PLACED);
+		fsm.event(MORE_BOATS);
+		fsm.event(BOAT_PLACED);
+		fsm.event(MORE_BOATS);
+		fsm.event(BOAT_PLACED);
+		fsm.event(MORE_BOATS);
+		fsm.event(BOAT_PLACED);
+		fsm.event(MORE_BOATS);
+		fsm.event(BOAT_PLACED);
+		fsm.event(MORE_BOATS);
+		assertTrue(fsm.getState().equals(BOAT_TO_PLACE));
+		fsm.event(BOAT_PLACED);
+		assertTrue(fsm.getState().equals(CHECK_BOAT_TO_PLACE));
+		fsm.event(NO_MORE_BOATS);
+		assertTrue(fsm.getState().equals(SHOT_NEEDED));
+
+		fsm.event(SHOT_TAKEN);
+		fsm.event(NOT_WON);
+		fsm.event(SHOT_TAKEN);
+		fsm.event(NOT_WON);
+		fsm.event(SHOT_TAKEN);
+		fsm.event(NOT_WON);
+		fsm.event(SHOT_TAKEN);
+		fsm.event(NOT_WON);
+		fsm.event(SHOT_TAKEN);
+		assertTrue(fsm.getState().equals(CHECK_WON));
+		fsm.event(NOT_WON);
+		assertTrue(fsm.getState().equals(SHOT_NEEDED));
+		fsm.event(SHOT_TAKEN);
+		assertTrue(fsm.getState().equals(CHECK_WON));
+		fsm.event(WON);
+		assertTrue(fsm.getState().equals(GAME_OVER));
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream oos;
+		try {
+			oos = new ObjectOutputStream(baos);
+			oos.writeObject(fsm);
+
+			ByteArrayInputStream bais = new ByteArrayInputStream(
+					baos.toByteArray());
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			FSM deserialised = (FSM) ois.readObject(); // InvalidClassException
+			assertTrue(deserialised.isState(deserialised.findStateByName("Game over")));
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("FSM (de)serialisation failed");
+		}
 	}
 }

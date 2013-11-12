@@ -1,9 +1,14 @@
 package fr.les_enry.util.fsm;
 
+import java.io.Serializable;
 
-abstract class BaseType {
+
+abstract class BaseType implements Serializable {
+
+	private static final long serialVersionUID = -5901944619472256851L;
 
 	private static int lastId = 0;
+	
 	private final int id;
 	private String name;
 	
