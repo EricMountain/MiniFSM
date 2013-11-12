@@ -172,7 +172,7 @@ public class FSMTest {
 	}
 	
 	@Test
-	public void testNavyBatal() {
+	public void testNavyBattle() {
 		FSM fsm = new FSM();
 
 		final State BOAT_TO_PLACE = fsm.state("Boat to place");
