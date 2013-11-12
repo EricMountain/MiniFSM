@@ -250,9 +250,19 @@ public class FSM implements Serializable {
 		// TODO Replace this full-scan with a Map lookup
 		for (Rule rule : rules) {
 			if (rule.initialState == state && rule.event == event) {
+				System.out.println(toString() + ">> Match: ("
+						+ rule.initialState + "," + rule.event + ") <> ("
+						+ state + "," + event + ")");
+				
 				state = rule.apply(args);
+				
 				System.out.println(toString() + ">> Resulting state: " + state);
+				
 				return state;
+			} else {
+				System.out.println(toString() + ">> Don't match: ("
+						+ rule.initialState + "," + rule.event + ") <> ("
+						+ state + "," + event + ")");
 			}
 		}
 
