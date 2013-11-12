@@ -320,7 +320,8 @@ public class FSMTest {
 			ByteArrayInputStream bais = new ByteArrayInputStream(
 					baos.toByteArray());
 			ObjectInputStream ois = new ObjectInputStream(bais);
-			FSM deserialised = (FSM) ois.readObject(); // InvalidClassException
+			FSM deserialised = (FSM) ois.readObject();
+			
 			assertTrue(deserialised.isState(deserialised.findStateByName("Game over")));
 		} catch (Exception e) {
 			e.printStackTrace();
