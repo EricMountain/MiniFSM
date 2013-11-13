@@ -181,10 +181,22 @@ public class FSM implements Serializable {
 		return obj;
 	}
 
+	/**
+	 * Create an Event object.
+	 * 
+	 * @param name
+	 * @return event.
+	 */
 	public Event event(String name) {
 		return (Event) factory(name, Event.class);
 	}
 
+	/**
+	 * Create a State object.
+	 * 
+	 * @param name
+	 * @return state.
+	 */
 	public State state(String name) {
 		return (State) factory(name, State.class);
 	}
