@@ -208,43 +208,45 @@ public class FSMTest {
 		fsm.rule().initial(CHECK_WON).event(WON).ok(GAME_OVER);
 		fsm.rule().initial(GAME_OVER).event(RESET).ok(BOAT_TO_PLACE);
 
-		fsm.start(BOAT_TO_PLACE);
+		for (int i = 0; i < 10; i++) {
+			fsm.start(BOAT_TO_PLACE);
 
-		fsm.event(BOAT_PLACED);
-		fsm.event(MORE_BOATS);
-		fsm.event(BOAT_PLACED);
-		fsm.event(MORE_BOATS);
-		fsm.event(BOAT_PLACED);
-		fsm.event(MORE_BOATS);
-		fsm.event(BOAT_PLACED);
-		fsm.event(MORE_BOATS);
-		fsm.event(BOAT_PLACED);
-		fsm.event(MORE_BOATS);
-		assertTrue(fsm.getState().equals(BOAT_TO_PLACE));
-		fsm.event(BOAT_PLACED);
-		assertTrue(fsm.getState().equals(CHECK_BOAT_TO_PLACE));
-		fsm.event(NO_MORE_BOATS);
-		assertTrue(fsm.getState().equals(SHOT_NEEDED));
+			fsm.event(BOAT_PLACED);
+			fsm.event(MORE_BOATS);
+			fsm.event(BOAT_PLACED);
+			fsm.event(MORE_BOATS);
+			fsm.event(BOAT_PLACED);
+			fsm.event(MORE_BOATS);
+			fsm.event(BOAT_PLACED);
+			fsm.event(MORE_BOATS);
+			fsm.event(BOAT_PLACED);
+			fsm.event(MORE_BOATS);
+			assertTrue(fsm.getState().equals(BOAT_TO_PLACE));
+			fsm.event(BOAT_PLACED);
+			assertTrue(fsm.getState().equals(CHECK_BOAT_TO_PLACE));
+			fsm.event(NO_MORE_BOATS);
+			assertTrue(fsm.getState().equals(SHOT_NEEDED));
 
-		fsm.event(SHOT_TAKEN);
-		fsm.event(NOT_WON);
-		fsm.event(SHOT_TAKEN);
-		fsm.event(NOT_WON);
-		fsm.event(SHOT_TAKEN);
-		fsm.event(NOT_WON);
-		fsm.event(SHOT_TAKEN);
-		fsm.event(NOT_WON);
-		fsm.event(SHOT_TAKEN);
-		assertTrue(fsm.getState().equals(CHECK_WON));
-		fsm.event(NOT_WON);
-		assertTrue(fsm.getState().equals(SHOT_NEEDED));
-		fsm.event(SHOT_TAKEN);
-		assertTrue(fsm.getState().equals(CHECK_WON));
-		fsm.event(WON);
-		assertTrue(fsm.getState().equals(GAME_OVER));
+			fsm.event(SHOT_TAKEN);
+			fsm.event(NOT_WON);
+			fsm.event(SHOT_TAKEN);
+			fsm.event(NOT_WON);
+			fsm.event(SHOT_TAKEN);
+			fsm.event(NOT_WON);
+			fsm.event(SHOT_TAKEN);
+			fsm.event(NOT_WON);
+			fsm.event(SHOT_TAKEN);
+			assertTrue(fsm.getState().equals(CHECK_WON));
+			fsm.event(NOT_WON);
+			assertTrue(fsm.getState().equals(SHOT_NEEDED));
+			fsm.event(SHOT_TAKEN);
+			assertTrue(fsm.getState().equals(CHECK_WON));
+			fsm.event(WON);
+			assertTrue(fsm.getState().equals(GAME_OVER));
 
-		fsm.event(RESET);
-		assertTrue(fsm.getState().equals(BOAT_TO_PLACE));
+			fsm.event(RESET);
+			assertTrue(fsm.getState().equals(BOAT_TO_PLACE));
+		}
 	}
 
 	@Test
@@ -321,8 +323,9 @@ public class FSMTest {
 					baos.toByteArray());
 			ObjectInputStream ois = new ObjectInputStream(bais);
 			FSM deserialised = (FSM) ois.readObject();
-			
-			assertTrue(deserialised.isState(deserialised.findStateByName("Game over")));
+
+			assertTrue(deserialised.isState(deserialised
+					.findStateByName("Game over")));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("FSM (de)serialisation failed");

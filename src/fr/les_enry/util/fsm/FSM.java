@@ -14,6 +14,7 @@ public class FSM implements Serializable {
 
 	private static final long serialVersionUID = 5664588699774045358L;
 
+	@SuppressWarnings("unused")
 	private transient Logger LOGGER = Logger.getLogger(this.getClass()
 			.getName());
 
@@ -22,6 +23,60 @@ public class FSM implements Serializable {
 	/** List of rules that make up this FSM. */
 	private List<Rule> rules = new ArrayList<Rule>();
 
+	private class StateEventPair implements Serializable {
+
+		private static final long serialVersionUID = 5954915353818353056L;
+
+		private final State state;
+		private final Event event;
+		
+		private StateEventPair(State state, Event event) {
+			this.state = state;
+			this.event = event;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + ((event == null) ? 0 : event.hashCode());
+			result = prime * result + ((state == null) ? 0 : state.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			StateEventPair other = (StateEventPair) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (event == null) {
+				if (other.event != null)
+					return false;
+			} else if (!event.equals(other.event))
+				return false;
+			if (state == null) {
+				if (other.state != null)
+					return false;
+			} else if (!state.equals(other.state))
+				return false;
+			return true;
+		}
+
+		private FSM getOuterType() {
+			return FSM.this;
+		}
+	}
+	
+	/** Maps (initial state, event) pairs to rules for faster lookup. */
+	private Map<StateEventPair, Rule> ruleLookup = new HashMap<StateEventPair, Rule>();
+	
 	/** Current FSM state. */
 	private State state = null;
 
@@ -46,15 +101,25 @@ public class FSM implements Serializable {
 		private Event event = null;
 		private Action action = null;
 
+		private void addRuleToLookupMap() {
+			if (initialState != null && event != null) {
+				ruleLookup.put(new StateEventPair(initialState, event), this);
+			}
+		}
+		
 		public Rule initial(State state) {
 			initialState = state;
 
+			addRuleToLookupMap();
+			
 			return this;
 		}
 
 		public Rule ok(State state) {
 			endState = state;
 
+			addRuleToLookupMap();
+			
 			return this;
 		}
 
@@ -308,25 +373,19 @@ public class FSM implements Serializable {
 	 *         rule found and isSoftEvent is true.
 	 */
 	public State event(boolean isSoftEvent, Event event, Object... args) {
-		LOGGER.info(toString() + ">> Received event: " + event);
+//		LOGGER.info(toString() + ">> Received event: " + event);
+		
+		Rule rule = ruleLookup.get(new StateEventPair(state, event));
+		if (rule != null) {
+//			LOGGER.info(toString() + ">> Match: (" + rule.initialState
+//					+ "," + rule.event + ") <> (" + state + "," + event
+//					+ ")");
 
-		// TODO Replace this full-scan with a Map lookup
-		for (Rule rule : rules) {
-			if (rule.initialState == state && rule.event == event) {
-				LOGGER.info(toString() + ">> Match: (" + rule.initialState
-						+ "," + rule.event + ") <> (" + state + "," + event
-						+ ")");
+			state = rule.apply(args);
 
-				state = rule.apply(args);
+//			LOGGER.info(toString() + ">> Resulting state: " + state);
 
-				LOGGER.info(toString() + ">> Resulting state: " + state);
-
-				return state;
-			} else {
-				LOGGER.info(toString() + ">> Don't match: ("
-						+ rule.initialState + "," + rule.event + ") <> ("
-						+ state + "," + event + ")");
-			}
+			return state;
 		}
 
 		if (isSoftEvent)
