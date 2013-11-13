@@ -5,10 +5,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
+/**
+ * Flying Spaghetti Monster.
+ */
 public class FSM implements Serializable {
 
 	private static final long serialVersionUID = 5664588699774045358L;
+
+	private transient Logger LOGGER = Logger.getLogger(this.getClass()
+			.getName());
 
 	private String name = "{unnamed_FSM}";
 
@@ -244,23 +251,22 @@ public class FSM implements Serializable {
 	 *         rule found and isSoftEvent is true.
 	 */
 	public State event(boolean isSoftEvent, Event event, Object... args) {
-		// TODO Implement proper logging
-		System.out.println(toString() + ">> Received event: " + event);
+		LOGGER.info(toString() + ">> Received event: " + event);
 
 		// TODO Replace this full-scan with a Map lookup
 		for (Rule rule : rules) {
 			if (rule.initialState == state && rule.event == event) {
-				System.out.println(toString() + ">> Match: ("
-						+ rule.initialState + "," + rule.event + ") <> ("
-						+ state + "," + event + ")");
-				
+				LOGGER.info(toString() + ">> Match: (" + rule.initialState
+						+ "," + rule.event + ") <> (" + state + "," + event
+						+ ")");
+
 				state = rule.apply(args);
-				
-				System.out.println(toString() + ">> Resulting state: " + state);
-				
+
+				LOGGER.info(toString() + ">> Resulting state: " + state);
+
 				return state;
 			} else {
-				System.out.println(toString() + ">> Don't match: ("
+				LOGGER.info(toString() + ">> Don't match: ("
 						+ rule.initialState + "," + rule.event + ") <> ("
 						+ state + "," + event + ")");
 			}
