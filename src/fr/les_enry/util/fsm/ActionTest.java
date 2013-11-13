@@ -29,15 +29,6 @@ public class ActionTest {
 		}
 	}
 
-	@Test
-	public void testCreateActionByPassingClass() {
-		FSM fsm = new FSM();
-
-		Action first = fsm.action(StaticAction.class);
-
-		assertNotNull(first);
-	}
-
 	@SuppressWarnings("serial")
 	@Test
 	public void testCreateAnonAction() {

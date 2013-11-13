@@ -190,19 +190,6 @@ public class FSM implements Serializable {
 	}
 
 	/**
-	 * Creates an Action object from a class. Not made public as this doesn't
-	 * look the best way to go.
-	 * 
-	 * @param action
-	 *            Class to instantiate.
-	 * @return Action object.
-	 * @deprecated
-	 */
-	Action action(Class<? extends Action> action) {
-		return (Action) factory(null, action);
-	}
-
-	/**
 	 * Stores an Event or State object in the appropriate map.
 	 * 
 	 * @param object
