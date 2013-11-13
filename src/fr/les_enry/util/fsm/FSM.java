@@ -19,13 +19,23 @@ public class FSM implements Serializable {
 
 	private String name = "{unnamed_FSM}";
 
+	/** List of rules that make up this FSM. */
 	private List<Rule> rules = new ArrayList<Rule>();
 
+	/** Current FSM state. */
 	private State state = null;
 
+	/** Map event names to objects. */
 	private final Map<String, Event> allEvents = new HashMap<String, Event>();
+
+	/** Map state names to objects. */
 	private final Map<String, State> allStates = new HashMap<String, State>();
 
+	/**
+	 * Represents a rule. Composed of an initial state, target state, event that
+	 * triggers the rule, an action to perform (optional), and an alternative
+	 * target state which is entered if the action "fails".
+	 */
 	public class Rule implements Serializable {
 
 		private static final long serialVersionUID = 3292473755494756309L;
@@ -83,6 +93,9 @@ public class FSM implements Serializable {
 		}
 	}
 
+	/**
+	 * Thrown if no rule applies to the current state when an event occurs.
+	 */
 	public class NoApplicableRuleException extends RuntimeException {
 		/**
 		 * 
@@ -94,6 +107,10 @@ public class FSM implements Serializable {
 		}
 	}
 
+	/**
+	 * Thrown if we try to create a derived class of BaseType that we don't know
+	 * of.
+	 */
 	public class UnknownBaseTypeException extends RuntimeException {
 		/**
 		 * Serialisation ID.
@@ -105,6 +122,9 @@ public class FSM implements Serializable {
 		}
 	}
 
+	/**
+	 * Thrown if we try to look up an action in the name/object maps.
+	 */
 	public class NoMapForBaseTypeException extends RuntimeException {
 		/**
 		 * Serialisation ID.
@@ -124,6 +144,16 @@ public class FSM implements Serializable {
 		this.name = name;
 	}
 
+	/**
+	 * Creates State, Event and Action objects. If an object of the same name
+	 * and type already exists it is returned, except for actions.
+	 * 
+	 * @param name
+	 *            Object name.
+	 * @param type
+	 *            Class of the object we want.
+	 * @return existing or new instance of the requested object.
+	 */
 	private BaseType factory(String name, final Class<? extends BaseType> type) {
 		BaseType obj;
 
@@ -166,11 +196,17 @@ public class FSM implements Serializable {
 	 * @param action
 	 *            Class to instantiate.
 	 * @return Action object.
+	 * @deprecated
 	 */
 	Action action(Class<? extends Action> action) {
 		return (Action) factory(null, action);
 	}
 
+	/**
+	 * Stores an Event or State object in the appropriate map.
+	 * 
+	 * @param object
+	 */
 	private void put(BaseType object) {
 		if (Event.class.isAssignableFrom(object.getClass())) {
 			allEvents.put(object.getName(), (Event) object);
@@ -185,6 +221,14 @@ public class FSM implements Serializable {
 		}
 	}
 
+	/**
+	 * Looks for an Event or State of the given name in the maps.
+	 * 
+	 * @param name
+	 * @param type
+	 *            Event or State
+	 * @return object if it is found in the maps, or null.
+	 */
 	private Object get(String name, Class<?> type) {
 		if (Event.class.isAssignableFrom(type)) {
 			return allEvents.get(name);
@@ -199,18 +243,31 @@ public class FSM implements Serializable {
 		}
 	}
 
-	public void start(State state) {
-		this.state = state;
-	}
-
+	/**
+	 * Gets the FSM's current state.
+	 * 
+	 * @return current state.
+	 */
 	public State getState() {
 		return state;
 	}
 
+	/**
+	 * Checks if the FSM is in the given state.
+	 * 
+	 * @param state
+	 * @return true if the FSM is in this state.
+	 */
 	public boolean isState(State state) {
 		return this.state == state;
 	}
 
+	/**
+	 * Checks if the FSM is in one of the given states.
+	 * 
+	 * @param states
+	 * @return true if the FSM is in one of the given states.
+	 */
 	public boolean isStateIn(State... states) {
 		for (State state : states)
 			if (isState(state))
@@ -219,14 +276,15 @@ public class FSM implements Serializable {
 		return false;
 	}
 
+	/**
+	 * Creates a new rule.
+	 * 
+	 * @return new rule.
+	 */
 	public Rule rule() {
 		Rule rule = new Rule();
 		rules.add(rule);
 		return rule;
-	}
-
-	public State event(Event event) {
-		return event(event, (Object) null);
 	}
 
 	/**
@@ -285,6 +343,17 @@ public class FSM implements Serializable {
 	 * runs the associated action.
 	 * 
 	 * @param event
+	 * @return state entered after applying the rule
+	 */
+	public State event(Event event) {
+		return event(event, (Object) null);
+	}
+
+	/**
+	 * Processes occurrence of an event. Searches for an applicable rule, and
+	 * runs the associated action.
+	 * 
+	 * @param event
 	 * @param args
 	 *            Optional objects to pass to the action
 	 * @return state entered after applying the rule
@@ -307,11 +376,12 @@ public class FSM implements Serializable {
 	}
 
 	/**
-	 * Forces the state of the FSM w/o applying any rules.
+	 * Forces the FSM's state. Normally only used when initially setting up the
+	 * FSM. No rules checked and no actions triggered.
 	 * 
 	 * @param state
 	 */
-	public void forceState(State state) {
+	public void start(State state) {
 		this.state = state;
 	}
 

@@ -49,7 +49,7 @@ public class FSMTest {
 
 		State byName = fsm.findStateByName("init");
 		assertTrue(byName == INIT);
-		fsm.forceState(byName);
+		fsm.start(byName);
 		assertTrue(fsm.getState() == INIT);
 	}
 
