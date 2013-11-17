@@ -1,9 +1,7 @@
 package fr.les_enry.util.fsm;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -20,9 +18,9 @@ public class FSM implements Serializable {
 
 	private String name = "{unnamed_FSM}";
 
-	/** List of rules that make up this FSM. */
-	private List<Rule> rules = new ArrayList<Rule>();
-
+	/**
+	 * Represents a (State, Event) pair for use in the lookup map.
+	 */
 	private class StateEventPair implements Serializable {
 
 		private static final long serialVersionUID = 5954915353818353056L;
@@ -230,13 +228,8 @@ public class FSM implements Serializable {
 		if (obj == null) {
 			try {
 				obj = (BaseType) (type.newInstance().setName(name));
-			} catch (InstantiationException e) {
-				// TODO Handle these exceptions better
-				e.printStackTrace();
-				return null;
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-				return null;
+			} catch (ReflectiveOperationException e) {
+				throw new RuntimeException("Failed to create a " + type + " due to " + e.getClass().getName(), e);
 			}
 		}
 
@@ -347,7 +340,7 @@ public class FSM implements Serializable {
 	 */
 	public Rule rule() {
 		Rule rule = new Rule();
-		rules.add(rule);
+
 		return rule;
 	}
 
@@ -355,7 +348,7 @@ public class FSM implements Serializable {
 	 * Clears all rules and resets current state to null.
 	 */
 	public void reset() {
-		rules.clear();
+		ruleLookup.clear();
 		state = null;
 	}
 

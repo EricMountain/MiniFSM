@@ -175,8 +175,17 @@ public class FSMTest {
 		assertTrue(fsm.getState().equals(INIT));
 
 		fsm.reset();
-
 		assertTrue(fsm.getState() == null);
+		
+		fsm.start(INIT);
+		try {
+			fsm.event(INSERT_COIN);
+			
+			fail("FSM incorrectly cleared");
+		} catch (FSM.NoApplicableRuleException e) {
+			// Good, FSM was reset including clearing rules
+		}
+		
 	}
 
 	@Test
