@@ -27,7 +27,7 @@ public class FSM implements Serializable {
 
 		private final State state;
 		private final Event event;
-		
+
 		private StateEventPair(State state, Event event) {
 			this.state = state;
 			this.event = event;
@@ -71,10 +71,10 @@ public class FSM implements Serializable {
 			return FSM.this;
 		}
 	}
-	
+
 	/** Maps (initial state, event) pairs to rules for faster lookup. */
 	private Map<StateEventPair, Rule> ruleLookup = new HashMap<StateEventPair, Rule>();
-	
+
 	/** Current FSM state. */
 	private State state = null;
 
@@ -104,12 +104,12 @@ public class FSM implements Serializable {
 				ruleLookup.put(new StateEventPair(initialState, event), this);
 			}
 		}
-		
+
 		public Rule initial(State state) {
 			initialState = state;
 
 			addRuleToLookupMap();
-			
+
 			return this;
 		}
 
@@ -117,7 +117,7 @@ public class FSM implements Serializable {
 			endState = state;
 
 			addRuleToLookupMap();
-			
+
 			return this;
 		}
 
@@ -228,8 +228,11 @@ public class FSM implements Serializable {
 		if (obj == null) {
 			try {
 				obj = (BaseType) (type.newInstance().setName(name));
-			} catch (ReflectiveOperationException e) {
-				throw new RuntimeException("Failed to create a " + type + " due to " + e.getClass().getName(), e);
+			} catch (Exception e) { // Dalvik doesn't support
+									// java.lang.ReflectiveOperationException
+									// until API level 19
+				throw new RuntimeException("Failed to create a " + type
+						+ " due to " + e.getClass().getName(), e);
 			}
 		}
 
@@ -366,17 +369,17 @@ public class FSM implements Serializable {
 	 *         rule found and isSoftEvent is true.
 	 */
 	public State event(boolean isSoftEvent, Event event, Object... args) {
-//		LOGGER.info(toString() + ">> Received event: " + event);
-		
+		// LOGGER.info(toString() + ">> Received event: " + event);
+
 		Rule rule = ruleLookup.get(new StateEventPair(state, event));
 		if (rule != null) {
-//			LOGGER.info(toString() + ">> Match: (" + rule.initialState
-//					+ "," + rule.event + ") <> (" + state + "," + event
-//					+ ")");
+			// LOGGER.info(toString() + ">> Match: (" + rule.initialState
+			// + "," + rule.event + ") <> (" + state + "," + event
+			// + ")");
 
 			state = rule.apply(args);
 
-//			LOGGER.info(toString() + ">> Resulting state: " + state);
+			// LOGGER.info(toString() + ">> Resulting state: " + state);
 
 			return state;
 		}
