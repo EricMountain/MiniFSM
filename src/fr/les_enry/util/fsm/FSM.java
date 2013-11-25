@@ -1,6 +1,9 @@
 package fr.les_enry.util.fsm;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -455,4 +458,32 @@ public class FSM implements Serializable {
 		return name;
 	}
 
+	private void digraphToWriter(Writer writer) {
+		try {
+			writer.write("digraph ");
+			writer.write("\"" + name + "\"");
+			writer.write(" {\n");
+			
+			for (State state: allStates.values()) {
+				writer.write("  \"" + state.toString() + "\"\n");
+			}
+			
+			for (Rule rule: ruleLookup.values()) {
+				writer.write("  \"" + rule.initialState + "\" -> \"" + rule.endState + "\" [ label = \"" + rule.event + "\" ]\n");
+				if (rule.failState != null)
+					writer.write("  \"" + rule.initialState + "\" -> \"" + rule.failState + "\" [ label = \"(fail) " + rule.event + "\" ]\n");
+			}
+			
+			writer.write("}\n");
+			
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public String toDag() {
+		StringWriter sw = new StringWriter();
+		digraphToWriter(sw);
+		return sw.toString();
+	}
 }
