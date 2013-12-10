@@ -463,24 +463,30 @@ public class FSM implements Serializable {
 			writer.write("digraph ");
 			writer.write("\"" + name + "\"");
 			writer.write(" {\n");
-			
-			for (State state: allStates.values()) {
-				writer.write("  \"" + state.toString() + "\"\n");
+
+			for (State state : allStates.values()) {
+				writer.write("  node [ shape = circle ] \"" + state.toString()
+						+ "\"\n");
 			}
-			
-			for (Rule rule: ruleLookup.values()) {
-				writer.write("  \"" + rule.initialState + "\" -> \"" + rule.endState + "\" [ label = \"" + rule.event + "\" ]\n");
+
+			for (Rule rule : ruleLookup.values()) {
+				writer.write("  \"" + rule.initialState + "\" -> \""
+						+ rule.endState + "\" [ label = \"" + rule.event
+						+ "\" ]\n");
 				if (rule.failState != null)
-					writer.write("  \"" + rule.initialState + "\" -> \"" + rule.failState + "\" [ label = \"(fail) " + rule.event + "\" ]\n");
+					writer.write("  \"" + rule.initialState + "\" -> \""
+							+ rule.failState
+							+ "\" [ style = \"dotted\", label = \""
+							+ rule.event + "\" ]\n");
 			}
-			
+
 			writer.write("}\n");
-			
+
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public String toDag() {
 		StringWriter sw = new StringWriter();
 		digraphToWriter(sw);
