@@ -383,7 +383,7 @@ public class FSMTest {
 		fsm.rule().initial(SHOT_NEEDED).event(SHOT_TAKEN).ok(CHECK_WON);
 		fsm.rule().initial(CHECK_WON).event(NOT_WON).ok(SHOT_NEEDED);
 		fsm.rule().initial(CHECK_WON).event(WON).ok(GAME_OVER);
-		fsm.rule().initial(GAME_OVER).event(RESET).ok(BOAT_TO_PLACE);
+		fsm.rule().initial(GAME_OVER).event(RESET).ok(BOAT_TO_PLACE).fail(GAME_OVER);
 
 		fsm.start(BOAT_TO_PLACE);
 

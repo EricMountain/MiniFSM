@@ -11,4 +11,5 @@ digraph "{unnamed_FSM}" {
   "Check boat to place" -> "Shot needed" [ label = "No more boats to place" ]
   "Check won" -> "Shot needed" [ label = "Game not won" ]
   "Game over" -> "Boat to place" [ label = "Reset game" ]
+  "Game over" -> "Game over" [ style = "dotted", label = "Reset game" ]
 }
