@@ -2,20 +2,32 @@ package fr.les_enry.util.fsm;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 
 public class FSMTest {
 
@@ -377,18 +389,81 @@ public class FSMTest {
 
 		String dag = fsm.toDag();
 		System.out.println(dag);
-	//TODO Code a proper test for this.  Hash comp is bad idea.
-//		try {
-//			MessageDigest sha1 = MessageDigest.getInstance("sha1");
-//			byte sha1bytes[] = sha1.digest(dag.getBytes("UTF-8"));
-//		} catch (UnsupportedEncodingException e) {
-//			e.printStackTrace();
-//			fail("Hash calculation failed");
-//		}
-//		for (byte b : sha1bytes) {
-//			System.out.print(Byte.toString(b) + " ");
-//		}
-//		System.out.println();
-		//assertEquals(, );
+		
+		String refFile = "ref/test1.gv";
+		try {
+			assertThat(new StringReader(dag), FileMatcher.fileTextMatches(new FileReader(new File(refFile))));
+		} catch (FileNotFoundException e) {
+			fail("File not found: " + refFile);
+		}
 	}
+	
+}
+
+/**
+ * Checks the content of 2 Graphviz sources represent identical graphs. 
+ */
+class FileMatcher {
+	public static <T> Matcher<Reader> fileTextMatches(final Reader expectedFile) {
+		return new BaseMatcher<Reader>() {
+		
+			@Override
+			public boolean matches(Object testReaderObj) {
+				BufferedReader testReader = new BufferedReader((Reader) testReaderObj);
+				
+				try {
+					BufferedReader expectedReader = new BufferedReader(expectedFile);
+					String expectedLine;
+					Map<String, Integer> string2Count = new HashMap<String, Integer>();
+					while ((expectedLine = expectedReader.readLine()) != null) {
+						final String edgeLinePrefix = "  \"";
+						String testLine = testReader.readLine();
+						
+						// System.out.println("expt: " + expectedLine);
+						// System.out.println("test: " + testLine);
+						
+						Matcher<?> nodeLineMatcher = CoreMatchers.equalTo(expectedLine);
+						Matcher<?> firstLineMatcher = CoreMatchers.equalTo("digraph \"{unnamed_FSM}\" {");
+						Matcher<?> lastLineMatcher = CoreMatchers.equalTo("}");
+						
+						// Rules aren't ordered, so edges don't come out in the same order every time.
+						// So check each edge occurs in each file.
+						if (firstLineMatcher.matches(testLine)) {
+							continue;
+						} else if (nodeLineMatcher.matches(testLine)) {
+							continue;
+						} else if (lastLineMatcher.matches(testLine)) {
+							continue;
+						} else if (testLine.startsWith(edgeLinePrefix) && expectedLine.startsWith(edgeLinePrefix)) {
+							// park
+							int c1 = string2Count.containsKey(testLine) ? string2Count.get(testLine) : 0;
+							string2Count.put(testLine, c1 + 1);
+							
+							int c2 = string2Count.containsKey(expectedLine) ? string2Count.get(expectedLine) : 0;
+							string2Count.put(expectedLine, c2 + 1);
+						} else {
+							return false;
+						}
+					}
+					
+					for (String str : string2Count.keySet()) {
+						if (string2Count.get(str) != 2) {
+							// TODO In more recent Hamcrest, use the describe failure feature
+							return false;
+						}
+					}
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+				
+				return true;
+			}
+
+			@Override
+			public void describeTo(Description description) {
+				description.appendText("content from each Reader to match");
+			}
+			
+		};
+	}	
 }

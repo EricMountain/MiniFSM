@@ -1,0 +1,14 @@
+digraph "{unnamed_FSM}" {
+  node [ shape = circle ] "Check won"
+  node [ shape = circle ] "Boat to place"
+  node [ shape = circle ] "Check boat to place"
+  node [ shape = circle ] "Shot needed"
+  node [ shape = circle ] "Game over"
+  "Boat to place" -> "Check boat to place" [ label = "Boat placed" ]
+  "Shot needed" -> "Check won" [ label = "Shot taken" ]
+  "Check won" -> "Game over" [ label = "Game won" ]
+  "Check boat to place" -> "Boat to place" [ label = "More boats to place" ]
+  "Check boat to place" -> "Shot needed" [ label = "No more boats to place" ]
+  "Check won" -> "Shot needed" [ label = "Game not won" ]
+  "Game over" -> "Boat to place" [ label = "Reset game" ]
+}
