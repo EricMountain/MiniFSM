@@ -388,7 +388,6 @@ public class FSMTest {
 		fsm.start(BOAT_TO_PLACE);
 
 		String dag = fsm.toDag();
-		System.out.println(dag);
 		
 		String refFile = "ref/test1.gv";
 		try {
