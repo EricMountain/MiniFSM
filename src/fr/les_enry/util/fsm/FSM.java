@@ -102,12 +102,22 @@ public class FSM implements Serializable {
 		private Event event = null;
 		private Action action = null;
 
+		/**
+		 * Adds this rule to the lookup map if both the initial state and
+		 * trigger event have been set.
+		 */
 		private void addRuleToLookupMap() {
 			if (initialState != null && event != null) {
 				ruleLookup.put(new StateEventPair(initialState, event), this);
 			}
 		}
 
+		/**
+		 * Sets the state the FSM must be in to trigger this rule.
+		 * 
+		 * @param state
+		 * @return this
+		 */
 		public Rule initial(State state) {
 			initialState = state;
 
@@ -116,6 +126,12 @@ public class FSM implements Serializable {
 			return this;
 		}
 
+		/**
+		 * State the FSM transitions to if the action returns true.
+		 * 
+		 * @param state
+		 * @return this
+		 */
 		public Rule ok(State state) {
 			endState = state;
 
@@ -124,18 +140,36 @@ public class FSM implements Serializable {
 			return this;
 		}
 
+		/**
+		 * Sets the event that triggers this rule.
+		 * 
+		 * @param event
+		 * @return this
+		 */
 		public Rule event(Event event) {
 			this.event = event;
 
 			return this;
 		}
 
+		/**
+		 * Defines the action that is run when the rule is triggered.
+		 * 
+		 * @param action
+		 * @return this
+		 */
 		public Rule action(Action action) {
 			this.action = action;
 
 			return this;
 		}
 
+		/**
+		 * State the FSM transitions to if the action returns false.
+		 * 
+		 * @param state
+		 * @return this
+		 */
 		public Rule fail(State state) {
 			failState = state;
 
@@ -143,7 +177,7 @@ public class FSM implements Serializable {
 		}
 
 		/**
-		 * Process the associated action. If it returns true (success), then
+		 * Processes the associated action. If it returns true (success), then
 		 * return the end state, else return the failure state. If no failure
 		 * state is defined, always returns the end state.
 		 * 
@@ -163,9 +197,7 @@ public class FSM implements Serializable {
 	 * Thrown if no rule applies to the current state when an event occurs.
 	 */
 	public class NoApplicableRuleException extends RuntimeException {
-		/**
-		 * 
-		 */
+
 		private static final long serialVersionUID = -8807461947595834489L;
 
 		public NoApplicableRuleException(String message) {
@@ -178,9 +210,7 @@ public class FSM implements Serializable {
 	 * of.
 	 */
 	public class UnknownBaseTypeException extends RuntimeException {
-		/**
-		 * Serialisation ID.
-		 */
+		
 		private static final long serialVersionUID = 2026589136585844252L;
 
 		public UnknownBaseTypeException(String message) {
@@ -192,9 +222,7 @@ public class FSM implements Serializable {
 	 * Thrown if we try to look up an action in the name/object maps.
 	 */
 	public class NoMapForBaseTypeException extends RuntimeException {
-		/**
-		 * Serialisation ID.
-		 */
+		
 		private static final long serialVersionUID = -8428840864735412207L;
 
 		public NoMapForBaseTypeException(String message) {
@@ -458,6 +486,11 @@ public class FSM implements Serializable {
 		return name;
 	}
 
+	/**
+	 * Serialises the FSM rules as a Graphviz digraph description.
+	 * 
+	 * @param writer
+	 */
 	private void digraphToWriter(Writer writer) {
 		try {
 			writer.write("digraph ");
@@ -487,6 +520,11 @@ public class FSM implements Serializable {
 		}
 	}
 
+	/**
+	 * Writes out the FSM au a Graphviz digraph in a string.
+	 * 
+	 * @return digraph as a string
+	 */
 	public String toDag() {
 		StringWriter sw = new StringWriter();
 		digraphToWriter(sw);
